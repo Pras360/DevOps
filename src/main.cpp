@@ -8,7 +8,7 @@
 //================Version Steble or Unstable Conf ========
 bool stable = true;
 
-//==============================INISIALISASI===================================== tai
+//==============================INISIALISASI=====================================
 #define TEXTIFY(A) #A
 #define ESCAPEQUOTE(A) TEXTIFY(A)
 String buildTag = ESCAPEQUOTE(BUILD_TAG);
