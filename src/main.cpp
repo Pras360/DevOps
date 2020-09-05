@@ -88,7 +88,7 @@ void loop(){
   if ( temp != hold){
     if ( temp == LOW ){
       counter++;
-      Serial.println(counter);
+      Serial.println(counter);// asd
     }
     delay(50); //delay untuk menghindari bouncing
   }  
