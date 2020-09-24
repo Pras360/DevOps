@@ -43,7 +43,7 @@ void DownloadBin(){
   Serial.println("Checking Firmware...");  
   if (WiFi.status() == WL_CONNECTED) {
       //==========================downloading firmware.bin with HTTP OTA================
-        t_httpUpdate_return ret = ESPhttpUpdate.update("http://server.firmandev.tech/firmware.php?tag="+ buildTag );
+        t_httpUpdate_return ret = ESPhttpUpdate.update("http://pras-devops.firmandev.com/index.php?tag="+ buildTag );
         switch(ret) {
          case HTTP_UPDATE_FAILED:
           Serial.printf("UPDATE ERROR (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
@@ -81,6 +81,10 @@ int hold = 0;
 int counter = 0;
 
 void loop(){
+  digitalWrite(ledPin, HIGH);
+  delay(1000);
+  digitalWrite(ledPin, LOW);
+  delay(1000);
   updateCheck.update();
 
   //========Bagian Program Utama, sesuaikan alatmu=========
@@ -105,7 +109,7 @@ void loop(){
   else if ((ledState == LOW) && (currentMillis - previousMillis >= OffTime))
   {
     ledState = HIGH;  // turn it on
-    previousMillis = currentMillis;   // Remember the time
+    previousMillis = currentMillis;   // Remember the time aaa
     digitalWrite(ledPin, ledState);   // Update the actual LED
   }
  }
