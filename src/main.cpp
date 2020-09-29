@@ -2,7 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiAP.h>
 #include <ESP8266WebServer.h>
-
+#include <DNSServer.h>
 //Include Sensor
 #include "Sensor/DigitalSensor/DigitalSensor.h"
 #include "Sensor/IRDistance/IRDistance.h"
