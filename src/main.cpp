@@ -173,8 +173,8 @@ void handleKoneksi() {
       }
 
       message = "Pengaturan koneksi telah tersimpan.";
-    }else{
-      message = error_message;
+    }else{ //aa 
+      message = error_message;// aa 
     }
   }
   server.send(200, "text/html", form.pengaturanKoneksi("/", message, "/", "/pengguna", "/firmware", "/login?disconnect=1", pengaturan.readWifiSSID(), pengaturan.readWifiPassword(), pengaturan.readMQTTBroker(), pengaturan.readDeviceNumber(), pengaturan.readDeviceTotal()));
