@@ -165,16 +165,16 @@ void handleKoneksi() {
       }
 
       if(pengaturan.readDeviceNumber() != server.arg(form.getArg(ARG_DEVICE_NUMBER))){
-        pengaturan.writeDeviceNumber(server.arg(form.getArg(ARG_DEVICE_NUMBER)));
+        pengaturan.writeDeviceNumber(server.arg(form.getArg(ARG_DEVICE_NUMBER))); //a 
       }
 
-      if(pengaturan.readDeviceTotal() != server.arg(form.getArg(ARG_DEVICE_TOTAL))){
-        pengaturan.writeDeviceTotal(server.arg(form.getArg(ARG_DEVICE_TOTAL)));
+      if(pengaturan.readDeviceTotal() != server.arg(form.getArg(ARG_DEVICE_TOTAL))){ //a 
+        pengaturan.writeDeviceTotal(server.arg(form.getArg(ARG_DEVICE_TOTAL))); //a 
       }
 
       message = "Pengaturan koneksi telah tersimpan.";
-    }else{ //aa 
-      message = error_message;// aa 
+    }else{ 
+      message = error_message;
     }
   }
   server.send(200, "text/html", form.pengaturanKoneksi("/", message, "/", "/pengguna", "/firmware", "/login?disconnect=1", pengaturan.readWifiSSID(), pengaturan.readWifiPassword(), pengaturan.readMQTTBroker(), pengaturan.readDeviceNumber(), pengaturan.readDeviceTotal()));
