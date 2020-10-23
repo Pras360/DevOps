@@ -551,7 +551,7 @@ public:
 
 void setup(){
     randomSeed(micros()); //Inisialisasi random
-    update.begin("http://pras-devops.firmandev.com/index.php");
+    update.begin("http://devops-silaju.000webhostapp.com/index.php");
     pengaturan.begin();
     pengaturan.writeUsername("admin");
     pengaturan.writePassword("admin");
