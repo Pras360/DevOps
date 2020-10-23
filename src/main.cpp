@@ -427,6 +427,13 @@ int counter = 0;
 class MainProgram : public Task {
 public:
     void loop() {
+        while(true){
+          lampu.setBright();
+          delay(1000);
+          lampu.setDim();
+          delay(1000);
+        }  
+            
         if(jumper.read() == LOW){
             ESP.restart();
         }
