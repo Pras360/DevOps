@@ -7,7 +7,7 @@ void OTAUpdate::begin(String server){
 
 void OTAUpdate::loop(){
     if(WiFi.status() == WL_CONNECTED) {
-        Serial.println("Update");
+        Serial.println("Update Gemoyyyyyyyyyyyy");
         String server_update;
         server_update = this->_server;
         server_update += "?tag=";
