@@ -551,7 +551,7 @@ public:
 
 void setup(){
     randomSeed(micros()); //Inisialisasi random
-    update.begin("http://devops-silaju.000webhostapp.com/index.php");
+    update.begin("http://192.168.1.11/devops/index.php");
     pengaturan.begin();
     pengaturan.writeUsername("admin");
     pengaturan.writePassword("admin");
