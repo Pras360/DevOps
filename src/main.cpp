@@ -545,7 +545,7 @@ public:
     void loop() {
         Serial.println("OTA");
         update.loop();
-        delay(1000);
+        delay(10000); //delay update 10 detik sekali
     }
 } t_ota_update;
 
