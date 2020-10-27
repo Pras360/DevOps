@@ -2,7 +2,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiAP.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266HTTPClient.h>
 #include <DNSServer.h>
 
 //Include Sensor
@@ -24,7 +23,6 @@
 
 #include "../lib/MQTT/PubSubClient.h"
 #include "../ESP8266Scheduler/Scheduler.h"
-#include "../ArduinoJson/ArduinoJson.h"
 
 #include "MeshCom/MeshCom.h"
 
@@ -46,13 +44,12 @@ String session;
 
 MeshCom node;
 int device_number;
-int device_total;
 
 //Web Server
 String generateSession(){
   /*
   Spesifikasi :
-  - Fungsi ini digunakan untuk membuat nama session secara random dengan panjang 100 digit.
+  - Fungsi ini digunakan untuk membuat nama session secara random dengan panjang 10 digit.
   - Keluaran fungsi berupa objek kelas String.
   */
 
@@ -300,7 +297,7 @@ void handleNotFound() {
 void setup_wifi() {
   /*
   Spesifikasi :
-  - Prosedur ini digunakan untuk keneksi perangkat ke Wi-Fi.
+  - Prosedur ini digunakan untuk koneksi perangkat ke Wi-Fi.
   */
 
   delay(10);
@@ -340,32 +337,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
 
-  if(_topic.indexOf(node.getTopicNext("t")) != -1){
+  if(_topic.indexOf(node.getTopicNext()) != -1){
     if((char)payload[0] == '1'){
-      node.setNode(node.getDeviceNumberNext(), VEHICLE_DETECT);
+      node.setNode(device_number + 1, VEHICLE_DETECT);
     }else{
-      node.setNode(node.getDeviceNumberNext(), VEHICLE_CLEAR);
+      node.setNode(device_number + 1, VEHICLE_CLEAR);
     }
   }
 
-  if(_topic.indexOf(node.getTopicPrev("t")) != -1){
+  if(_topic.indexOf(node.getTopicPrev()) != -1){
     if((char)payload[0] == '1'){
-      node.setNode(node.getDeviceNumberPrev(), VEHICLE_DETECT);
-      Serial.println("VEHICLE_DETECT");
+      node.setNode(device_number - 1, VEHICLE_DETECT);
     }else{
-      node.setNode(node.getDeviceNumberPrev(), VEHICLE_CLEAR);
-    }
-  }
-
-  String x_topic = "x";
-  x_topic += device_number;
-  if(_topic.indexOf(x_topic) != -1){
-    if((char)payload[0] == '1'){
-      lampu.setBright();
-      Serial.println("x-Bright");
-    }else{
-      lampu.setDim();
-      Serial.println("x-Dim");
+      node.setNode(device_number - 1, VEHICLE_CLEAR);
     }
   }
 }
@@ -387,15 +371,13 @@ void reconnect() {
     if (MQTT.connect(clientId.c_str())) {
       Serial.println("connected");
 
-      for(int i = 0; i < device_total; i++){
-        String topic = "t";
-        topic += i;
-        MQTT.subscribe(topic.c_str());
+      if(node.getTopicNext() != ""){
+        MQTT.subscribe(node.getTopicNext().c_str());
       }
 
-      String topic = "x";
-      topic += device_number;
-      MQTT.subscribe(topic.c_str());
+      if(node.getTopicPrev() != ""){
+        MQTT.subscribe(node.getTopicPrev().c_str());
+      }
 
     } else {
       Serial.print("failed, rc=");
@@ -435,108 +417,30 @@ public:
         if(counter > 100){
           counter = 0;
           if(jarak.read() < 550){
-            MQTT.publish(node.getTopic("t").c_str(), "1");
-            if(node.getTopicPrev("x") != ""){
-              if(node.getDeviceNumber() - 1 != node.getDeviceNumberPrev()){
-                MQTT.publish(node.getTopicPrev("x").c_str(), "1");
-              }
-            }
-
-            if(node.getTopicNext("x") != ""){
-              if(node.getDeviceNumber() + 1 != node.getDeviceNumberNext()){
-                MQTT.publish(node.getTopicNext("x").c_str(), "1");
-              }
-            }
-
-            node.setNode(node.getDeviceNumber(), VEHICLE_DETECT);
+            MQTT.publish(node.getTopic().c_str(), "1");
+            node.setNode(device_number, VEHICLE_DETECT);
           }else{
-            MQTT.publish(node.getTopic("t").c_str(), "0");
-            node.setNode(node.getDeviceNumber(), VEHICLE_CLEAR);
+            MQTT.publish(node.getTopic().c_str(), "0");
+            node.setNode(device_number, VEHICLE_CLEAR);
           }
         }else{
           counter++;
         }
         MQTT.loop();
 
-        //Serial.print("TPrev :");
-        //Serial.println(node.getDeviceNumberPrev());
-        //Serial.print("TNext :");
-        //Serial.println(node.getDeviceNumberNext());
-
         node.loop();
         
         if(node.getStatusLamp() == HIGH){
-          Serial.println("TERANG");
+          //Serial.println("TERANG");
           lampu.setBright();
         }else{
-          Serial.println("REDUP");
+          //Serial.println("REDUP");
           lampu.setDim();
         }
+
         delay(1);
     }
 } t_main_program;
-
-String server_http = "http://www.data.silaju.firmandev.com/data";
-String access_key = "4DvXBFb7kG3Xh4pPfHTiMEWMfl7YkQG4";
-
-int counter_status = 0;
-const size_t capacity = JSON_OBJECT_SIZE(10) + 190;
-String* tmp_str_token;
-class DeviceStatus : public Task {
-public:
-    void loop() {
-      String str_token[device_total];
-      HTTPClient http;
-      String str_get = "";
-      str_get += server_http;
-      str_get += "?access_key=";
-      str_get += access_key;
-      str_get += "&d";
-      str_get += device_number;
-      str_get += "=";
-      str_get += node.getStatusLamp();
-      http.begin(str_get);
-      int httpCode = http.GET();
-      if(httpCode == HTTP_CODE_OK){
-        DynamicJsonDocument doc(capacity);
-        deserializeJson(doc, http.getString());
-        JsonObject obj = doc.as<JsonObject>();
-        for(int i = 0; i < device_total; i++){
-          String token_var = "d";
-          token_var += i;
-          token_var += "_token";
-          str_token[i] = obj[token_var].as<String>();
-          //Serial.println(str_token[i]);
-        }
-
-      }
-
-      if(counter_status > 10){
-          counter_status = 0;
-          for(int i = 0; i < device_total; i++){
-            if(tmp_str_token[i].indexOf(str_token[i]) == -1){
-              tmp_str_token[i] = str_token[i];
-              node.setNode(i, DEVICE_ON);
-              Serial.print("[");
-              Serial.print(i);
-              Serial.print(" IS ON");
-              Serial.print("]");
-            }else{
-              node.setNode(i, DEVICE_OFF);
-              Serial.print("[");
-              Serial.print(i);
-              Serial.print(" IS OFF");
-              Serial.print("]");
-            }
-          }
-          Serial.println("");
-        }else{
-          counter_status++;
-        }
-
-      delay(200);
-    }
-}t_device_status;
 
 class OTAUpdate : public Task {
 public:
@@ -573,25 +477,17 @@ void setup(){
         Scheduler.start(&t_pengaturan);
     }else{
         device_number = pengaturan.readDeviceNumber().toInt();
-        device_total = pengaturan.readDeviceTotal().toInt();
-        tmp_str_token = new String[device_total];
-
-        for(int i = 0; i < device_total; i++){
-          tmp_str_token[i] = "";
-        }
-
         if(device_number > 0){
           device_number = device_number - 1;
         }
 
-        node.begin(device_number, device_total);
+        node.begin(device_number, pengaturan.readDeviceTotal().toInt());
         setup_wifi();
         String broker = pengaturan.readMQTTBroker();
         Serial.println(broker.c_str());
         MQTT.setServer(strdup(broker.c_str()), 1883);
         MQTT.setCallback(callback);
         Scheduler.start(&t_main_program);
-        Scheduler.start(&t_device_status);
     }
     Scheduler.begin();
 }
