@@ -21,7 +21,6 @@
 //------------------------------------------------------------------------------
 
 #include "FirmwareInformation/FirmwareInformation.h"
-#include "OTAUpdate/OTAUpdate.h"
 
 #include "../lib/MQTT/PubSubClient.h"
 #include "../ESP8266Scheduler/Scheduler.h"
@@ -44,7 +43,6 @@ Lamp lampu(4);
 Led led(LED_BUILTIN);
 
 String session;
-OTAUpdate update;
 
 MeshCom node;
 int device_number;
@@ -331,16 +329,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
   - Prosedur ini akan terpanggil apabila ada perubahan topic yang telah di subscribe perangkat.
   */
 
-  //Serial.print("Message arrived [");
-  //Serial.print(topic);
-  //Serial.print("] ");
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
 
   String _topic = topic;
   
   for (unsigned int i = 0; i < length; i++) {
-    //Serial.print((char)payload[i]);
+    Serial.print((char)payload[i]);
   }
-  //Serial.println();
+  Serial.println();
 
   if(_topic.indexOf(node.getTopicNext("t")) != -1){
     if((char)payload[0] == '1'){
@@ -353,7 +351,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(_topic.indexOf(node.getTopicPrev("t")) != -1){
     if((char)payload[0] == '1'){
       node.setNode(node.getDeviceNumberPrev(), VEHICLE_DETECT);
-      //Serial.println("VEHICLE_DETECT");
+      Serial.println("VEHICLE_DETECT");
     }else{
       node.setNode(node.getDeviceNumberPrev(), VEHICLE_CLEAR);
     }
@@ -364,10 +362,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(_topic.indexOf(x_topic) != -1){
     if((char)payload[0] == '1'){
       lampu.setBright();
-      //Serial.println("x-Bright");
+      Serial.println("x-Bright");
     }else{
       lampu.setDim();
-      //Serial.println("x-Dim");
+      Serial.println("x-Dim");
     }
   }
 }
@@ -468,10 +466,10 @@ public:
         node.loop();
         
         if(node.getStatusLamp() == HIGH){
-          //Serial.println("TERANG");
+          Serial.println("TERANG");
           lampu.setBright();
         }else{
-          //Serial.println("REDUP");
+          Serial.println("REDUP");
           lampu.setDim();
         }
         delay(1);
@@ -519,19 +517,19 @@ public:
             if(tmp_str_token[i].indexOf(str_token[i]) == -1){
               tmp_str_token[i] = str_token[i];
               node.setNode(i, DEVICE_ON);
-              //Serial.print("[");
-              //Serial.print(i);
-              //Serial.print(" IS ON");
-              //Serial.print("]");
+              Serial.print("[");
+              Serial.print(i);
+              Serial.print(" IS ON");
+              Serial.print("]");
             }else{
               node.setNode(i, DEVICE_OFF);
-              //Serial.print("[");
-              //Serial.print(i);
-              //Serial.print(" IS OFF");
-              //Serial.print("]");
+              Serial.print("[");
+              Serial.print(i);
+              Serial.print(" IS OFF");
+              Serial.print("]");
             }
           }
-          //Serial.println("");
+          Serial.println("");
         }else{
           counter_status++;
         }
@@ -540,18 +538,16 @@ public:
     }
 }t_device_status;
 
-class OTAUpdateTask : public Task {
+class OTAUpdate : public Task {
 public:
     void loop() {
         Serial.println("OTA");
-        update.loop();
-        delay(10000); //delay update 10 detik sekali
+        delay(100);
     }
 } t_ota_update;
 
 void setup(){
     randomSeed(micros()); //Inisialisasi random
-    update.begin("http://devops-silaju.000webhostapp.com/index.php");
     pengaturan.begin();
     pengaturan.writeUsername("admin");
     pengaturan.writePassword("admin");
@@ -596,7 +592,6 @@ void setup(){
         MQTT.setCallback(callback);
         Scheduler.start(&t_main_program);
         Scheduler.start(&t_device_status);
-        Scheduler.start(&t_ota_update);
     }
     Scheduler.begin();
 }
