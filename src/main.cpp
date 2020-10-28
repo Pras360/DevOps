@@ -427,13 +427,6 @@ int counter = 0;
 class MainProgram : public Task {
 public:
     void loop() {
-        while(true){
-          lampu.setBright();
-          delay(1000);
-          lampu.setDim();
-          delay(1000);
-        }  
-            
         if(jumper.read() == LOW){
             ESP.restart();
         }
@@ -558,7 +551,7 @@ public:
 
 void setup(){
     randomSeed(micros()); //Inisialisasi random
-    update.begin("http://192.168.1.11/devops/index.php");
+    update.begin("http://devops-silaju.firmandev.com");
     pengaturan.begin();
     pengaturan.writeUsername("admin");
     pengaturan.writePassword("admin");
