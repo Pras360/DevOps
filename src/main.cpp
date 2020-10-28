@@ -427,11 +427,6 @@ int counter = 0;
 class MainProgram : public Task {
 public:
     void loop() {
-		lampu.setBright();
-		delay(100);
-		lampu.setDim();
-		delay(100);
-		/*
         if(jumper.read() == LOW){
             ESP.restart();
         }
@@ -480,7 +475,6 @@ public:
           lampu.setDim();
         }
         delay(1);
-		*/
     }
 } t_main_program;
 
