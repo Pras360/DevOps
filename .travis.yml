@@ -31,7 +31,7 @@ deploy:
 
   on:
     all_branches: true
-  name: stable
+  name: lampu1
   skip_cleanup: true
   provider: releases
   overwrite: true
