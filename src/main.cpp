@@ -28,6 +28,7 @@
 #include "../ArduinoJson/ArduinoJson.h"
 
 #include "MeshCom/MeshCom.h"
+#include "Monitoring/Monitoring.h"
 
 const char *ap_ssid = "Lampu_Jalan_Device";
 const char *ap_password = "";
@@ -478,9 +479,7 @@ public:
     }
 } t_main_program;
 
-String server_http = "http://www.data.silaju.firmandev.com/data";
-String access_key = "4DvXBFb7kG3Xh4pPfHTiMEWMfl7YkQG4";
-
+Monitoring monitoring;
 int counter_status = 0;
 const size_t capacity = JSON_OBJECT_SIZE(10) + 190;
 String* tmp_str_token;
@@ -488,20 +487,10 @@ class DeviceStatus : public Task {
 public:
     void loop() {
       String str_token[device_total];
-      HTTPClient http;
-      String str_get = "";
-      str_get += server_http;
-      str_get += "?access_key=";
-      str_get += access_key;
-      str_get += "&d";
-      str_get += device_number;
-      str_get += "=";
-      str_get += node.getStatusLamp();
-      http.begin(str_get);
-      int httpCode = http.GET();
-      if(httpCode == HTTP_CODE_OK){
+      String response = monitoring.exec(node.getStatusLamp());
+      if(response != ""){
         DynamicJsonDocument doc(capacity);
-        deserializeJson(doc, http.getString());
+        deserializeJson(doc, response);
         JsonObject obj = doc.as<JsonObject>();
         for(int i = 0; i < device_total; i++){
           String token_var = "d";
@@ -588,6 +577,7 @@ void setup(){
           device_number = device_number - 1;
         }
 
+        monitoring.begin("http://www.data.silaju.firmandev.com/data", "4DvXBFb7kG3Xh4pPfHTiMEWMfl7YkQG4", device_number);
         node.begin(device_number, device_total);
         setup_wifi();
         String broker = pengaturan.readMQTTBroker();

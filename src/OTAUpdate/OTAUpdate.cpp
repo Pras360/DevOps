@@ -66,8 +66,5 @@ void OTAUpdate::loop(){
                 Serial.println("Update Disable");
             }
         }
-        /*
-        
-        */
     }
 }
