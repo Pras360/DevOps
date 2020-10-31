@@ -28,7 +28,6 @@
 #include "../ArduinoJson/ArduinoJson.h"
 
 #include "MeshCom/MeshCom.h"
-#include "Monitoring/Monitoring.h"
 
 const char *ap_ssid = "Lampu_Jalan_Device";
 const char *ap_password = "";
@@ -332,16 +331,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
   - Prosedur ini akan terpanggil apabila ada perubahan topic yang telah di subscribe perangkat.
   */
 
-  //Serial.print("Message arrived [");
-  //Serial.print(topic);
-  //Serial.print("] ");
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
 
   String _topic = topic;
   
   for (unsigned int i = 0; i < length; i++) {
-    //Serial.print((char)payload[i]);
+    Serial.print((char)payload[i]);
   }
-  //Serial.println();
+  Serial.println();
 
   if(_topic.indexOf(node.getTopicNext("t")) != -1){
     if((char)payload[0] == '1'){
@@ -354,7 +353,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(_topic.indexOf(node.getTopicPrev("t")) != -1){
     if((char)payload[0] == '1'){
       node.setNode(node.getDeviceNumberPrev(), VEHICLE_DETECT);
-      //Serial.println("VEHICLE_DETECT");
+      Serial.println("VEHICLE_DETECT");
     }else{
       node.setNode(node.getDeviceNumberPrev(), VEHICLE_CLEAR);
     }
@@ -365,10 +364,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(_topic.indexOf(x_topic) != -1){
     if((char)payload[0] == '1'){
       lampu.setBright();
-      //Serial.println("x-Bright");
+      Serial.println("x-Bright");
     }else{
       lampu.setDim();
-      //Serial.println("x-Dim");
+      Serial.println("x-Dim");
     }
   }
 }
@@ -479,7 +478,9 @@ public:
     }
 } t_main_program;
 
-Monitoring monitoring;
+String server_http = "http://www.data.silaju.firmandev.com/data";
+String access_key = "4DvXBFb7kG3Xh4pPfHTiMEWMfl7YkQG4";
+
 int counter_status = 0;
 const size_t capacity = JSON_OBJECT_SIZE(10) + 190;
 String* tmp_str_token;
@@ -487,10 +488,20 @@ class DeviceStatus : public Task {
 public:
     void loop() {
       String str_token[device_total];
-      String response = monitoring.exec(node.getStatusLamp());
-      if(response != ""){
+      HTTPClient http;
+      String str_get = "";
+      str_get += server_http;
+      str_get += "?access_key=";
+      str_get += access_key;
+      str_get += "&d";
+      str_get += device_number;
+      str_get += "=";
+      str_get += node.getStatusLamp();
+      http.begin(str_get);
+      int httpCode = http.GET();
+      if(httpCode == HTTP_CODE_OK){
         DynamicJsonDocument doc(capacity);
-        deserializeJson(doc, response);
+        deserializeJson(doc, http.getString());
         JsonObject obj = doc.as<JsonObject>();
         for(int i = 0; i < device_total; i++){
           String token_var = "d";
@@ -508,19 +519,19 @@ public:
             if(tmp_str_token[i].indexOf(str_token[i]) == -1){
               tmp_str_token[i] = str_token[i];
               node.setNode(i, DEVICE_ON);
-              //Serial.print("[");
-              //Serial.print(i);
-              //Serial.print(" IS ON");
-              //Serial.print("]");
+              Serial.print("[");
+              Serial.print(i);
+              Serial.print(" IS ON");
+              Serial.print("]");
             }else{
               node.setNode(i, DEVICE_OFF);
-              //Serial.print("[");
-              //Serial.print(i);
-              //Serial.print(" IS OFF");
-              //Serial.print("]");
+              Serial.print("[");
+              Serial.print(i);
+              Serial.print(" IS OFF");
+              Serial.print("]");
             }
           }
-          //Serial.println("");
+          Serial.println("");
         }else{
           counter_status++;
         }
@@ -577,7 +588,6 @@ void setup(){
           device_number = device_number - 1;
         }
 
-        monitoring.begin("http://www.data.silaju.firmandev.com/data", "4DvXBFb7kG3Xh4pPfHTiMEWMfl7YkQG4", device_number);
         node.begin(device_number, device_total);
         setup_wifi();
         String broker = pengaturan.readMQTTBroker();
@@ -586,7 +596,7 @@ void setup(){
         MQTT.setCallback(callback);
         Scheduler.start(&t_main_program);
         Scheduler.start(&t_device_status);
-        Scheduler.start(&t_ota_update);
+		Scheduler.start(&t_ota_update);
     }
     Scheduler.begin();
 }
