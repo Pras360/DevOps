@@ -135,7 +135,7 @@ void handleKoneksi() {
   String message = "";
   if (!is_authentified()) {
     server.sendHeader("Location", "/login");
-    server.sendHeader("Cache-Control", "no-cache");
+    server.sendHeader("Cache-Control", "no-cache");//test
     server.send(301);
     return;
   }
