@@ -56,6 +56,7 @@ String generateSession(){
   */
 
   String char_set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+  // ya di test lagii
   String str = "HOME_AUTOMATION_SESSION=";
   for(int i = 0; i < 10; i++){
     str += char_set[random(char_set.length())];
@@ -135,7 +136,7 @@ void handleKoneksi() {
   String message = "";
   if (!is_authentified()) {
     server.sendHeader("Location", "/login");
-    server.sendHeader("Cache-Control", "no-cache");//test
+    server.sendHeader("Cache-Control", "no-cache");
     server.send(301);
     return;
   }
