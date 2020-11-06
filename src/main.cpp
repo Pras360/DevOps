@@ -57,7 +57,8 @@ String generateSession(){
 
   String char_set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
   String str = "HOME_AUTOMATION_SESSION=";
-  for(int i = 0; i < 10; i++){//coba dicoba
+  for(int i = 0; i < 10; i++){//coba lagi ya
+  //yakali gaada coba
     str += char_set[random(char_set.length())];
   }
   return str;
