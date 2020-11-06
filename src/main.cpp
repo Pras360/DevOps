@@ -204,7 +204,7 @@ void handlePengguna() {
   String message = "";
   if (!is_authentified()) {
     server.sendHeader("Location", "/login");
-    server.sendHeader("Cache-Control", "no-cache");
+    server.sendHeader("Cache-Control", "no-cache")//disini error nih ;
     server.send(301);
     return;
   }
@@ -305,7 +305,7 @@ void setup_wifi() {
 
   delay(10);
   Serial.println();
-  Serial.print("Connecting to ")// disini error lagi ;
+  Serial.print("Connecting to ");
   Serial.println(pengaturan.readWifiSSID());
   WiFi.begin(pengaturan.readWifiSSID().c_str(), pengaturan.readWifiPassword().c_str());
 
