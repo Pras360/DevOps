@@ -297,7 +297,7 @@ void handleNotFound() {
 
 
 //MQTT
-void setup_wifi() {
+void etup_wifi() {// disini error
   /*
   Spesifikasi :
   - Prosedur ini digunakan untuk keneksi perangkat ke Wi-Fi.
