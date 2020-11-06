@@ -297,15 +297,15 @@ void handleNotFound() {
 
 
 //MQTT
-void etup_wifi() {// disini error
+void setup_wifi() {
   /*
   Spesifikasi :
-  - Prosedur ini digunakan untuk keneksi perangkat ke Wi-Fi.
+  - Prosedur ini digunakan untuk koneksi perangkat ke Wi-Fi.
   */
 
   delay(10);
   Serial.println();
-  Serial.print("Connecting to ");
+  Serial.print("Connecting to ")// disini error lagi ;
   Serial.println(pengaturan.readWifiSSID());
   WiFi.begin(pengaturan.readWifiSSID().c_str(), pengaturan.readWifiPassword().c_str());
 
