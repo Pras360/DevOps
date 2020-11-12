@@ -58,7 +58,6 @@ String generateSession(){
   String char_set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
   String str = "HOME_AUTOMATION_SESSION=";
   for(int i = 0; i < 10; i++){
-
     str += char_set[random(char_set.length())];
   }
   return str;
@@ -300,7 +299,7 @@ void handleNotFound() {
 void setup_wifi() {
   /*
   Spesifikasi :
-  - Prosedur ini digunakan untuk koneksi perangkat ke Wi-Fi.
+  - Prosedur ini digunakan untuk keneksi perangkat ke Wi-Fi.
   */
 
   delay(10);
@@ -450,7 +449,7 @@ public:
     void loop() {
         Serial.println("OTA");
         update.loop();
-        delay(10000); //delay update selama 10 detik sekali
+        delay(10000); //delay update 10 detik sekali
     }
 } t_ota_update;
 
